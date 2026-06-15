@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: quemelo-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: securepassword
+      POSTGRES_DB: quemelo
+    ports:
+      - "127.0.0.1:5432:5432" # Bind to localhost only to block external network access
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: quemelo-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: securepassword
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: quemelo
+    depends_on:
+      - postgres
+    volumes:
+      - uploads-data:/app/public/uploads
+
+volumes:
+  postgres-data:
+  uploads-data:
